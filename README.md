@@ -4,5 +4,5 @@
 - Vincent Renard
 - Thibaut Vacheron
 
-##QisKit
+## QisKit
 
