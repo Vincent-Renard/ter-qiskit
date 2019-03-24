@@ -5,7 +5,7 @@
 - Vincent Renard
 - Thibaut Vacheron
 - Joseph Dudouy
-- *(Kevin Aubier)*
+- Kevin Aubier
 
 ## QisKit
 
