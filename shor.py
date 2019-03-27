@@ -75,7 +75,10 @@ def cpower7mod15(qc, q, c, power, i=0):
         qc.barrier()
 
 
-def createPowerCircuit7mod15(qc, q, i=0, nbInputQbit=3):
+def createPowerCircuit7mod15(qc, q, nbInputQbit=3):
+    # 1 element neutre de la multiplication
+    qc.x(q[nbInputQbit + 3])
+    
     for i in range(nbInputQbit - 1, -1, -1):
         power = 2 ** (nbInputQbit - i - 1)
         cpower7mod15(qc, q, q[i], power, nbInputQbit)
@@ -143,12 +146,10 @@ qc = QuantumCircuit(q, c)
 # On met en superposition total le registre d'entrée
 hadamardX(qc, q, nbInputQbit)
 
-# 1 element neutre de la multiplication
-qc.x(q[size - 1])
 qc.barrier()
 
 # On crée le circuit 7^x avec x valeur pris dans le registre d'entrée
-createPowerCircuit7mod15(qc, q, 0, nbInputQbit)
+createPowerCircuit7mod15(qc, q,  nbInputQbit)
 qc.barrier()
 
 # Transformation de Fourier Quantique
