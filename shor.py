@@ -21,7 +21,9 @@ def qft(circ, q, n):
 
 
 def qftN(circ, q, deb, fin):
-    """n-qubit QFT on q in circ."""
+    """
+    n-qubit QFT on q in circ.
+    """
     for j in range(deb, fin):
         for k in range(deb, j):
             circ.cu1(math.pi / float(2 ** (j - k)), q[j], q[k])
@@ -127,54 +129,53 @@ def decompose(a, periode, N):
             print(str(N) + "=" + str(p1) + "*" + str(p2))
 
 
-# On recherche la periode de 7**x mod 15
+if __name__ == '__main__':
+    # On recherche la periode de 7**x mod 15
+    # On peut changer le nombre de bit d'entrée pour voir que tout fonctionne
+    # Valeur 3 par defaut pour respecter la contrainte des 7 qbits du circuit.
+    nbInputQbit = 3
+    sizeCircuitPower = 4
+    size = nbInputQbit + sizeCircuitPower
 
+    q = QuantumRegister(size)
+    c = ClassicalRegister(size)
+    qc = QuantumCircuit(q, c)
 
-# On peut changer le nombre de bit d'entrée pour voir que tout fonctionne
-# Valeur 3 par defaut pour respecter la contrainte des 7 qbits du circuit.
-nbInputQbit = 3
-sizeCircuitPower = 4
-size = nbInputQbit + sizeCircuitPower
+    # On met en superposition total le registre d'entrée
+    hadamardX(qc, q, nbInputQbit)
 
-q = QuantumRegister(size)
-c = ClassicalRegister(size)
-qc = QuantumCircuit(q, c)
+    # 1 element neutre de la multiplication
+    qc.x(q[size - 1])
+    qc.barrier()
 
-# On met en superposition total le registre d'entrée
-hadamardX(qc, q, nbInputQbit)
+    # On crée le circuit 7^x avec x valeur pris dans le registre d'entrée
+    createPowerCircuit7mod15(qc, q, 0, nbInputQbit)
+    qc.barrier()
 
-# 1 element neutre de la multiplication
-qc.x(q[size - 1])
-qc.barrier()
+    # Transformation de Fourier Quantique
+    qft(qc, q, nbInputQbit)
 
-# On crée le circuit 7^x avec x valeur pris dans le registre d'entrée
-createPowerCircuit7mod15(qc, q, 0, nbInputQbit)
-qc.barrier()
+    # On mesure les Qbit d'entrée
+    measureX(qc, q, c, 0, nbInputQbit)
 
-# Transformation de Fourier Quantique
-qft(qc, q, nbInputQbit)
+    # Lance la simulation
+    backend = Aer.get_backend('qasm_simulator')
+    job_sim = execute(qc, backend)
+    sim_result = job_sim.result()
 
-# On mesure les Qbit d'entrée
-measureX(qc, q, c, 0, nbInputQbit)
+    # On affiche le circuit(opt)
+    t = circuit_drawer(qc, 0.7, None, None, "text")
+    print(t)
 
-# Lance la simulation
-backend = Aer.get_backend('qasm_simulator')
-job_sim = execute(qc, backend)
-sim_result = job_sim.result()
+    # On affiche les resultat
+    # Si fonctionne le nombre de pic doit être egal à la période càd ici 4
+    print(sim_result.get_counts(qc))
 
-# On affiche le circuit(opt)
-t = circuit_drawer(qc, 0.7, None, None, "text")
-print(t)
+    counts = sim_result.get_counts(qc)
+    period = calculPeriod(counts, sizeCircuitPower, nbInputQbit)
 
-# On affiche les resultat
-# Si fonctionne le nombre de pic doit être egal à la période càd ici 4
-print(sim_result.get_counts(qc))
-
-counts = sim_result.get_counts(qc)
-period = calculPeriod(counts, sizeCircuitPower, nbInputQbit)
-
-if period == 0:
-    print("Erreur dans la recherche de période\n")
-else:
-    print("La période vaut " + str(period) + "\n")
-    decompose(7, period, 15)
+    if period == 0:
+        print("Erreur dans la recherche de période\n")
+    else:
+        print("La période vaut " + str(period) + "\n")
+        decompose(7, period, 15)
