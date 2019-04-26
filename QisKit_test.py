@@ -18,3 +18,4 @@ job_sim = execute(qc, backend)
 sim_result = job_sim.result()
 
 print(sim_result.get_counts(qc))
+print(qc.draw())
