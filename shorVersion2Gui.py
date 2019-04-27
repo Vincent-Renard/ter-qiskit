@@ -14,6 +14,45 @@ def hadamardX(qc, q, nb):
     for i in range(0, nb):
         qc.h(q[i])
 
+# Controlled Circuit for 2*input with c control qbit
+def cmulti2mod15(qc, q, c, i=0):
+    qc.ccx(c, q[3 + i], q[0 + i])
+    qc.ccx(c, q[0 + i], q[3 + i])
+    qc.ccx(c, q[3 + i], q[0 + i])
+
+    qc.ccx(c, q[1 + i], q[0 + i])
+    qc.ccx(c, q[0 + i], q[1 + i])
+    qc.ccx(c, q[1 + i], q[0 + i])
+
+    qc.ccx(c, q[2 + i], q[1 + i])
+    qc.ccx(c, q[1 + i], q[2 + i])
+    qc.ccx(c, q[2 + i], q[1 + i])
+
+# Controlled Circuit for 4*input with c control qbit
+def cmulti4mod15(qc, q, c, i=0):
+    qc.ccx(c, q[2 + i], q[0 + i])
+    qc.ccx(c, q[0 + i], q[2 + i])
+    qc.ccx(c, q[2 + i], q[0 + i])
+
+    qc.ccx(c, q[3 + i], q[1 + i])
+    qc.ccx(c, q[1 + i], q[3 + i])
+    qc.ccx(c, q[3 + i], q[1 + i])
+
+# Controlled Circuit for 8*input with c control qbit
+def cmulti8mod15(qc, q, c, i=0):
+    qc.ccx(c, q[1 + i], q[0 + i])
+    qc.ccx(c, q[0 + i], q[1 + i])
+    qc.ccx(c, q[1 + i], q[0 + i])
+
+    qc.ccx(c, q[2 + i], q[0 + i])
+    qc.ccx(c, q[0 + i], q[2 + i])
+    qc.ccx(c, q[2 + i], q[0 + i])
+
+    qc.ccx(c, q[3 + i], q[0 + i])
+    qc.ccx(c, q[0 + i], q[3 + i])
+    qc.ccx(c, q[3 + i], q[0 + i])
+
+
 # Controlled Circuit for 7*input with c control qbit
 def cmulti7mod15(qc, q, c, i=0):
     qc.cx(c, q[0 + i])
@@ -49,6 +88,25 @@ def cmulti11mod15(qc, q, c, i=0):
     qc.ccx(c, q[1 + i], q[3 + i])
     qc.ccx(c, q[3 + i], q[1 + i])
 
+# Controlled Circuit for 13*input with c control qbit
+def cmulti13mod15(qc, q, c, i=0):
+    qc.cx(c, q[0 + i])
+    qc.cx(c, q[1 + i])
+    qc.cx(c, q[2 + i])
+    qc.cx(c, q[3 + i])
+
+    qc.ccx(c, q[3 + i], q[0 + i])
+    qc.ccx(c, q[0 + i], q[3 + i])
+    qc.ccx(c, q[3 + i], q[0 + i])
+
+    qc.ccx(c, q[1 + i], q[0 + i])
+    qc.ccx(c, q[0 + i], q[1 + i])
+    qc.ccx(c, q[1 + i], q[0 + i])
+
+    qc.ccx(c, q[2 + i], q[1 + i])
+    qc.ccx(c, q[1 + i], q[2 + i])
+    qc.ccx(c, q[2 + i], q[1 + i])
+
 # Controlled Circuit for 7^power with c control qbit
 def cpower7mod15(qc, q, c, power, i=0):
     for j in range(1, power + 1):
@@ -61,13 +119,26 @@ def cpower11mod15(qc, q, c, power, i=0):
         cmulti11mod15(qc, q, c, i)
         qc.barrier()
 
+#Création d'un circuit controllé en fct de a qui fait 1*a puis on fait l'exponentiation
 def createPowerCircuit(QuantumCircuit, QuantumRegister, i=0, nbInputQbit=3, a=7):
     for i in range(nbInputQbit - 1, -1, -1):
         power = 2 ** (nbInputQbit - i - 1)
-        if a==7:
-            cpower7mod15(QuantumCircuit, QuantumRegister, QuantumRegister[i], power, nbInputQbit)
-        elif a==11:
-            cpower11mod15(QuantumCircuit, QuantumRegister, QuantumRegister[i], power, nbInputQbit)
+        for j in range(1, power + 1):
+            if a == 2:
+                cmulti2mod15(QuantumCircuit, QuantumRegister, QuantumRegister[i], nbInputQbit)
+            elif a == 4:
+                cmulti4mod15(QuantumCircuit, QuantumRegister, QuantumRegister[i], nbInputQbit)
+            elif a == 8:
+                cmulti8mod15(QuantumCircuit, QuantumRegister, QuantumRegister[i], nbInputQbit)
+            elif a == 7:
+                cmulti7mod15(QuantumCircuit, QuantumRegister, QuantumRegister[i], nbInputQbit)
+            elif a == 11:
+                cmulti11mod15(QuantumCircuit, QuantumRegister, QuantumRegister[i], nbInputQbit)
+            elif a == 13:
+                cmulti13mod15(QuantumCircuit, QuantumRegister, QuantumRegister[i], nbInputQbit)
+            else:
+                return
+            QuantumCircuit.barrier()
 
 def qft(circ, q, n):
     """n-qubit QFT on q in circ."""
@@ -175,8 +246,6 @@ def fctShor(N,sequence):
     a = random.choice(sequence)
     sequence.remove(a)
 
-    #########################ici on a mis a=11
-    a=11
     print("Shor=========================\nN=" + str(N)+"\na=" + str(a))
 
     # Pgcd de N et de a
