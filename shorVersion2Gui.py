@@ -107,18 +107,6 @@ def cmulti13mod15(qc, q, c, i=0):
     qc.ccx(c, q[1 + i], q[2 + i])
     qc.ccx(c, q[2 + i], q[1 + i])
 
-# Controlled Circuit for 7^power with c control qbit
-def cpower7mod15(qc, q, c, power, i=0):
-    for j in range(1, power + 1):
-        cmulti7mod15(qc, q, c, i)
-        qc.barrier()
-
-# Controlled Circuit for 11^power with c control qbit
-def cpower11mod15(qc, q, c, power, i=0):
-    for j in range(1, power + 1):
-        cmulti11mod15(qc, q, c, i)
-        qc.barrier()
-
 #Création d'un circuit controllé en fct de a qui fait 1*a puis on fait l'exponentiation
 def createPowerCircuit(QuantumCircuit, QuantumRegister, i=0, nbInputQbit=3, a=7):
     for i in range(nbInputQbit - 1, -1, -1):
@@ -245,6 +233,8 @@ def fctShor(N,sequence):
     #On choisi le a de facon random
     a = random.choice(sequence)
     sequence.remove(a)
+
+    a=7
 
     print("Shor=========================\nN=" + str(N)+"\na=" + str(a))
 
