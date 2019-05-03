@@ -177,7 +177,6 @@ a = QuantumRegister(n, "a")
 b = QuantumRegister(n, "b")
 c = QuantumRegister(n,"c")
 
-# swap c avec d
 
 
 cin = QuantumRegister(1, "cin")
