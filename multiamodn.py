@@ -198,7 +198,7 @@ def newmultAmodC(qc,a,b,c,vA,vC,control,cin,cout,n,inp):
     set(qc,c,vC)
     val =vA
 
-    for i in range(0,2):
+    for i in range(0,inp):
         set(qc,a,val)
         print(val)
         createAddModulo(qc, cin, a, b, c, cout, n, control[i])
