@@ -217,5 +217,5 @@ qc.measure(cout[1], ans[n+1])
 print("Run")
 
 backend = Aer.get_backend('qasm_simulator')
-job_sim = execute(qc, backend)
+job_sim = execute(qc, backend,shots=50)
 print(job_sim.result().get_counts(qc))
