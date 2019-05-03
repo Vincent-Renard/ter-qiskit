@@ -153,44 +153,6 @@ def createAddModulo(add_circ,cin,a,b,c,cout,n,control):
 
 
 
-#Not used
-def cswap(qc,c,a,b):
-    qc.ccx(c,a, b)
-    qc.ccx(c,b, a)
-    qc.ccx(c,a, b)
-
-
-
-#Not used
-def createMult2(qc,q,control,cin,n):
-     cswap(qc,control,cin,q[0])
-     for i in range(1,n):
-         cswap(qc,control,cin,q[i])
-
-
-
-
-
-
-'''
-def multAmodC(qc,a,b,c,vA,vC,control,cin,cout,n):
-
-    if (vA%2==1) and vA >1:
-        print(vA)
-        print("+x")
-        vA-=1
-        multAmodC(qc, a, b, c, vA, vC, control, cin, cout, n)
-        createAddModulo(qc,cin,a,b,c,cout,n,control)
-
-    elif  vA>1 :
-        print(vA)
-        print("*2")
-        vA= int(vA/2)
-        multAmodC(qc, a, b, c, vA, vC, control, cin, cout, n)
-        createMult2(qc,b,control,cin[0],n)
-        createModulo(qc,cin,b,c,cout,n,control)
-
-'''
 
 #Calcule control * vA % vC
 def newmultAmodC(qc,a,b,c,vA,vC,control,cin,cout,n,inp):
@@ -230,53 +192,18 @@ ans = ClassicalRegister(n + 2, "ans")
 qc = QuantumCircuit(a, b,c, cin, cout, ans,control ,name="rippleadd")
 
 
-
-subcircuit = QuantumCircuit(cin, a, b,c, cout, control)
-
-
-
-
-'''
-set(qc, a, 5)
-set(qc, b, 4)
-set(qc,c,7)
-
-'''
-'''
-set(qc,a,4)
-
-set(qc,c,6)
-'''
-
-
-
-
-set(qc,control,3)
+set(qc,control,4)
 
 qc.barrier()
 
+#vA et control  doivent être inférieur à vC
 
-
-#createMult2(qc,b,control[0],cin[0],n)
-#createControlSubCirc(subcircuit, cin, a, b, cout, n, control[0])
-#createControlAddCirc(subcircuit,cin,a,b,cout[0],n,control[0]) ->OK
-#createAddModulo(subcircuit,cin,a,b,c,cout,n,control[0])
-#createAddModulo(subcircuit,cin,a,b,c,cout,n,control[0])
-#createComparator(subcircuit,cin,c,b,cout[1],n,control[0])
-#createControlSubCirc(subcircuit,cin,a,b,cout[1],n,control[0])
-#createModulo(subcircuit,cin,b,c,cout,n,control[0])
-#createControlSub2Circ(subcircuit, cin, c, b, cout[0], n, control[0])
-#qc += subcircuit
+#Calcule 3 * control %vC et stock le resultat dans b
 
 
 vA=3
-vC=6
-
-#Calcule 3 * control %vC et stock le resultat dans b
+vC=5
 newmultAmodC(qc,a,b,c,vA,vC,control,cin,cout,n,inp)
-
-
-
 
 
 
