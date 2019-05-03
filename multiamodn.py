@@ -50,6 +50,18 @@ def set(qc, a, N):
         N /= 2
 
 
+def findInverse(vA,N):
+    for i in range(0,N):
+        if((vA*i)%N==1):
+            return i
+
+
+
+def swap(qc,a,b):
+    qc.cx(a, b)
+    qc.cx(b, a)
+    qc.cx(a, b)
+
 
 
 def createAddCirc(adder_subcircuit, cin, a, b, cout, n):
@@ -153,12 +165,17 @@ def createAddModulo(add_circ,cin,a,b,c,cout,n,control):
 
 
 
+def hadamardX(qc, q, nb):
+    for i in range(0, nb):
+        qc.h(q[i])
 
-#Calcule control * vA % vC
+
+#Calcule control * vA % vC et stock le resultat dans control
 def newmultAmodC(qc,a,b,c,vA,vC,control,cin,cout,n,inp):
 
     set(qc,c,vC)
     val =vA
+
 
     for i in range(0,inp):
         set(qc,a,val)
@@ -167,31 +184,47 @@ def newmultAmodC(qc,a,b,c,vA,vC,control,cin,cout,n,inp):
         set(qc,a,val)
         val= (val*2)%vC
 
+    # on swap b et control
+    for i in range(0,inp):
+        swap(qc,b[i],control[i])
 
-n = 4
+    val=findInverse(vA, vC)
+    print("Inverse==")
+    print(val)
 
+
+    #on multiplie b par l'inverse de a pour pouvoir le reintialiser à 0
+    for i in range(0,inp):
+        set(qc,a,val)
+        createAddModulo(qc, cin, a, b, c, cout, n, control[i])
+        set(qc, a, val)
+        print(val)
+        val = (val * 2) % vC
+
+    qc.x(b[0])
+
+
+n = 5
 #taille du registre de controle
-inp=3
+
+inp= 5
 
 a = QuantumRegister(n, "a")
 b = QuantumRegister(n, "b")
 c = QuantumRegister(n,"c")
 
-
-
 cin = QuantumRegister(1, "cin")
 cout = QuantumRegister(2, "cout")
 control = QuantumRegister(inp, "control")
-
-
-
-
 
 ans = ClassicalRegister(n + 2, "ans")
 qc = QuantumCircuit(a, b,c, cin, cout, ans,control ,name="rippleadd")
 
 
-set(qc,control,4)
+#hadamardX(qc,control,inp)
+
+
+set(qc,control,5)
 
 qc.barrier()
 
@@ -199,23 +232,24 @@ qc.barrier()
 
 #Calcule 3 * control %vC et stock le resultat dans b
 
+vA=7
+vC=9
 
-vA=3
-vC=5
+
+
+
+#stock le resultat dans control et remet bien b à 0
 newmultAmodC(qc,a,b,c,vA,vC,control,cin,cout,n,inp)
 
-
-
 for j in range(n):
-    qc.measure(b[j], ans[j])
+    qc.measure(control[j], ans[j])
 
 qc.measure(cout[0],ans[n])
 qc.measure(cout[1], ans[n+1])
 
 
-
 print("Run")
 
 backend = Aer.get_backend('qasm_simulator')
-job_sim = execute(qc, backend,shots=50)
+job_sim = execute(qc, backend,shots=1)
 print(job_sim.result().get_counts(qc))
