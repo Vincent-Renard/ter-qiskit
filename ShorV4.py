@@ -24,12 +24,10 @@ def cswap(qc,c,a,b):
     qc.ccx(c,b, a)
     qc.ccx(c,a, b)
 
-
 def mult2mod15(qc,q,c,i):
-
-    cswap(qc,c,q[0+i],q[3+i])
+    cswap(qc, c, q[1 + i], q[2 + i])
     cswap(qc,c,q[0+i],q[1+i])
-    cswap(qc,c,q[1+i],q[2+i])
+    cswap(qc, c, q[0 + i], q[3 + i])
 
 
 def howManyBits(N):
