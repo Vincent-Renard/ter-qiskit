@@ -5,13 +5,15 @@
 from qiskit import QuantumRegister, ClassicalRegister
 from qiskit import QuantumCircuit, Aer, execute
 
-q = QuantumRegister(2)
-c = ClassicalRegister(2)
+q = QuantumRegister(3,'q')
+c = ClassicalRegister(3,'c')
 qc = QuantumCircuit(q, c)
 
-qc.h(q[0])
-qc.cx(q[0], q[1])
+
+qc.ct(q[0], q[1],q[3])
 qc.measure(q, c)
+
+print(qc.draw())
 
 backend = Aer.get_backend('qasm_simulator')
 job_sim = execute(qc, backend)
